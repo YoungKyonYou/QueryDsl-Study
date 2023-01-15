@@ -1,0 +1,72 @@
+//querydsl 추가 스프링 2.6부터는 5.0 이상을 쓴다
+buildscript {
+    ext {
+        queryDslVersion = "5.0.0"
+    }
+}
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.7.5'
+    //querydsl 추가
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+}
+
+
+
+group = 'study'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    //querydsl 라이브러리 추가
+    //querydsl-jpa는 실제 select from 등 애플리케이션을 작성할 때 필요한 라이브러리이다.
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    //apt는 Q클래스명을 만들어주는 라이브러리라고 생각하면 된다.
+    annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
+
+    //쿼리를 잘 알아보게 해준다.
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.8'
+
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'com.h2database:h2'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation ('org.springframework.boot:spring-boot-starter-test'){
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+//querydsl 추가 시작
+def querydslDir = "$buildDir/generated/querydsl"
+querydsl {
+    jpa = true
+    querydslSourcesDir = querydslDir
+}
+sourceSets {
+    main.java.srcDir querydslDir
+}
+configurations {
+    querydsl.extendsFrom compileClasspath
+}
+compileQuerydsl {
+    options.annotationProcessorPath = configurations.querydsl
+}
+//querydsl 추가 끝
