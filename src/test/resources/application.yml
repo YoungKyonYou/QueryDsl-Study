@@ -4,7 +4,7 @@ server:
 spring:
   profiles:
     # 샘플 데이터 추가가 테스트 케이스 실행에 영향을 주지 않도록 다음과 같이 프로파일을 설정하자
-    active: local
+    active: test
   h2:
     console:
       enabled: true
